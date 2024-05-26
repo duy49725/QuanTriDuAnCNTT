@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Monthly Revenue Chart";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<canvas id="revenueChart" width="400" height="200"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/Admin/Reports/MonthlyRevenueData')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched Data:', data); // Log dữ liệu ra console
+
+                const labels = data.map(item => `${item.month}/${item.year}`);
+                const revenues = data.map(item => item.totalRevenue);
+                console.log('Labels:', labels); // Log labels
+                console.log('Revenues:', revenues); // Log revenues
+                const ctx = document.getElementById('revenueChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Total Revenue',
+                            data: revenues,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching the data:', error));
+    });
+</script>
